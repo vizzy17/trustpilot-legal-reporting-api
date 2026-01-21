@@ -1,5 +1,5 @@
-Trustpilot Legal Reporting API — Take‑Home Solution
-A lightweight, production‑style FastAPI service that ingests a mock Trustpilot reviews dataset, normalises it into a relational PostgreSQL schema, and exposes CSV‑exporting API endpoints to support ad‑hoc legal and compliance data requests.
+📘 Trustpilot Legal Reporting API — Take‑Home Solution
+A lightweight, production‑style FastAPI service that ingests a mock Trustpilot reviews dataset, normalises it into a relational schema, and exposes CSV‑exporting API endpoints to support ad‑hoc legal and compliance data requests.
 
 The API answers the three core legal queries:
 
@@ -9,9 +9,9 @@ Provide reviews by user Y
 
 Provide user account information for user Z
 
-In addition, the solution includes optional enhancements such as filtering, pagination, operational endpoints, and a /businesses endpoint with CSV export.
+In addition, the solution includes enhancements such as filtering, pagination, operational endpoints, and a /businesses endpoint with CSV export.
 
-1. Overview
+🧭 Overview
 This project demonstrates:
 
 A clean ETL pipeline (CSV → staging → normalised tables)
@@ -22,11 +22,13 @@ CSV export for legal/compliance workflows
 
 Clear separation between required and enhancement endpoints
 
-Senior‑level engineering practices: structure, clarity, observability, and documentation
+Senior‑level engineering practices: structure, clarity, observability, documentation
 
-The solution is intentionally lightweight to fit the 3–6 hour assessment window while still showing production‑minded thinking.
+A lightweight design showing production‑minded thinking
 
-2. Repository Structure
+
+
+📂 Repository Structure
 Code
 trustpilot-legal-reporting-api/
 │
@@ -54,42 +56,59 @@ trustpilot-legal-reporting-api/
 │
 ├── requirements.txt
 └── README.md
-3. Architecture Diagram (Lightweight)
+
+
+🏗️ Architecture Diagram (Lightweight)
 Code
 Client (Legal Team / Tools)
-        |
-        v
-   FastAPI App
-        |
-        v
- Normalised PostgreSQL DB
-        ^
-        |
+            |
+            v
+        FastAPI App
+            |
+            v
+ Normalised SQLite DB (Codespaces)
+            ^
+            |
  ETL Scripts (staging → clean)
-        ^
-        |
+            ^
+            |
    trustpilot_reviews.csv
-4. Data Lineage (Governance‑Style)
-Code
-CSV → staging_reviews → cleaned_reviews → {users, businesses, reviews} → API → Legal Team
-5. Entity Relationship Diagram (ERD)
-Code
-USERS (reviewer_id PK) 1 ──── * REVIEWS * ──── 1 BUSINESSES (business_id PK)
-6. Setup Instructions
-1. Create virtual environment
-Code
-python -m venv .venv
-.venv\Scripts\activate
-2. Install dependencies
-Code
-pip install -r requirements.txt
-3. Configure environment
-Create .env:
 
+
+🔄 Data Lineage (Governance‑Style)
 Code
-DATABASE_URL=postgresql://postgres:password@localhost:5432/trustpilot
-4. Run ETL
+CSV
+  → staging_reviews
+      → cleaned_reviews
+          → {users, businesses, reviews}
+              → API
+                  → Legal Team
+
+
+🧬 Entity Relationship Diagram (ERD)
 Code
+USERS (reviewer_id PK)
+        1 ───── * REVIEWS * ───── 1
+BUSINESSES (business_id PK)
+
+
+🚀 Running the Project (GitHub Codespaces — Recommended)
+This project is fully runnable inside GitHub Codespaces, which provides a clean, reproducible environment with no local setup required.
+
+1. Create and activate a virtual environment
+bash
+python -m venv .venv
+source .venv/bin/activate
+2. Install dependencies
+bash
+pip install -r requirements.txt
+3. Configure environment (.env)
+Codespaces does not support PostgreSQL without elevated permissions, so this project uses SQLite for a frictionless, portable setup.
+
+bash
+echo DATABASE_URL=sqlite:///./trustpilot.db > .env
+4. Run the ETL pipeline
+bash
 python -m scripts.setup_db
 This:
 
@@ -99,16 +118,41 @@ Loads raw CSV into staging
 
 Normalises into users, businesses, reviews
 
-7. Running the API
-Start the server:
+5. Start the API
+bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+6. Open the public Swagger UI
+In Codespaces:
+
+Open the PORTS tab
+
+Locate port 8000
+
+Click the forwarded URL
+
+Append /docs
+
+Example:
 
 Code
+https://vigilant-bassoon-7wv6w45vj5vcxv65-8000.app.github.dev/docs
+🌍 Live Demo (Public URL)
+A live version of the API is available here:
+
+Code
+https://vigilant-bassoon-7wv6w45vj5vcxv65-8000.app.github.dev/docs
+This allows the reviewer to explore all endpoints directly in Swagger.
+
+
+
+🧪 Local Development (Optional)
+If running locally with PostgreSQL:
+
+bash
+DATABASE_URL=postgresql://postgres:password@localhost:5432/trustpilot
+python -m scripts.setup_db
 uvicorn app.main:app --reload
-Open Swagger:
-
-Code
-http://127.0.0.1:8000/docs
-8. API Endpoints
+📡 API Endpoints
 Required (Assessment Spec)
 GET /reviews/business/{business_id}
 Returns all reviews for a business as CSV.
@@ -121,7 +165,7 @@ Returns user account information.
 
 Enhancements (Optional)
 GET /reviews/
-Filtering + pagination + CSV export
+Filtering + pagination + CSV export.
 Supports:
 
 start_date / end_date
@@ -136,7 +180,7 @@ GET /businesses/
 Returns all businesses (JSON).
 
 GET /businesses/export
-Returns all businesses as CSV (enhancement).
+Returns all businesses as CSV.
 
 GET /health
 Heartbeat.
@@ -152,7 +196,9 @@ businesses
 
 reviews
 
-9. Example Queries
+
+
+📝 Example Queries
 Reviews for a business
 Code
 /reviews/business/24a6a92a-f745-455f-b669-f2f02842039f
@@ -165,13 +211,13 @@ Code
 Export businesses as CSV
 Code
 /businesses/export
-10. Data Cleaning & Normalisation
+
+
+🧹 Data Cleaning & Normalisation
 Ingestion
 Raw CSV → staging table
 
-Deduplication
-Rules applied:
-
+Deduplication Rules
 Duplicate review_id
 
 Same reviewer + business + date + content
@@ -188,16 +234,11 @@ PK/FK constraints
 
 Referential integrity
 
-Indexes on:
+Indexes on reviewer_id, business_id, review_date
 
-reviewer_id
 
-business_id
-
-review_date
-
-11. Performance Considerations
-Indexes added on high‑cardinality join/filter fields
+⚡ Performance Considerations
+Indexes on high‑cardinality join/filter fields
 
 CSV streaming avoids loading large datasets into memory
 
@@ -205,28 +246,32 @@ Pagination prevents large result sets
 
 Filtering pushed down to SQL for efficiency
 
-Normalised schema reduces duplication and improves query speed
+Normalised schema reduces duplication
 
-Avoided ORM overhead for bulk operations (raw SQL used where appropriate)
+Avoided ORM overhead for bulk operations
 
-12. Productionisation Considerations
-If this were promoted beyond PoC:
 
-Add Docker Compose (API + Postgres)
 
-Add authentication / API keys
+🏭 Productionisation Considerations
+If promoted beyond PoC:
 
-Add async SQLAlchemy for concurrency
+Docker Compose (API + Postgres)
 
-Add caching for repeated legal queries
+Authentication / API keys
 
-Add CI/CD pipeline
+Async SQLAlchemy
 
-Add S3 export for large CSVs
+Caching for repeated legal queries
 
-Add monitoring (Prometheus + Grafana)
+CI/CD pipeline
 
-13. How AI Was Used
+S3 export for large CSVs
+
+Monitoring (Prometheus + Grafana)
+
+
+
+🤖 How AI Was Used
 AI was used to:
 
 Accelerate boilerplate FastAPI scaffolding
@@ -241,8 +286,11 @@ Provide debugging hints during ETL development
 
 All final code, validation, and architectural decisions were made manually.
 
-14. Testing
+
+
+🧪 Testing
 Manual Smoke Tests (via Swagger)
+
 GET /reviews/business/{id}
 
 GET /reviews/user/{id}
@@ -255,16 +303,18 @@ GET /businesses
 
 GET /businesses/export
 
-Automated Tests (Future Work)
-pytest suite for:
 
+
+Automated Tests (Future Work)
 ETL correctness
 
 API response structure
 
 CSV export validation
 
-15. Conclusion
+
+
+🏁 Conclusion
 This solution delivers a clean, modular, and production‑minded PoC that satisfies the assessment requirements while demonstrating:
 
 Strong engineering fundamentals
