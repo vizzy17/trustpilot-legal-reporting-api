@@ -312,6 +312,27 @@ API response structure
 
 CSV export validation
 
+🚀 Deployment
+The API is deployed on Render and publicly accessible without authentication.
+
+Public Swagger UI:  
+[https://trustpilot-legal-reporting-api.onrender.com/docs]
+
+This deployment uses:
+
+Render Web Service (Free tier)
+
+Uvicorn as the ASGI server
+
+SQLite as the PoC database
+
+FastAPI auto‑generated OpenAPI docs for interactive testing
+
+The service is started using:
+
+Code
+uvicorn app.main:app --host 0.0.0.0 --port 10000
+A render.yaml file is included in the repository to support reproducible deployments.
 
 
 🏁 Conclusion
